@@ -1,0 +1,25 @@
+@CHARSET "UTF-8";
+
+body{
+	/*background:rgb(242,242,242);*/
+}
+
+hr{
+	border-top: 1px solid rgb(51,122,183);
+}
+
+.panel-primary>.panel-heading {
+    color: #fff;
+    background-color: #337ab7;
+    border-color: #337ab7;
+}
+
+.panel-primary {
+    border-color: #337ab7;
+}
+.Modal{
+	margin-top:50px;
+}
+
+
+/*#337ab7*/

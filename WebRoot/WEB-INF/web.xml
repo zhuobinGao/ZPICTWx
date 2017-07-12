@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app version="3.0" 
+	xmlns="http://java.sun.com/xml/ns/javaee" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee 
+	http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd">
+  <display-name></display-name>
+  
+  
+  <servlet>  
+        <servlet-name>Log4JInitServlet</servlet-name>  
+        <servlet-class>com.weixin.log.Log4JInitServlet</servlet-class>  
+        <init-param>  
+            <param-name>log4j-properties-location</param-name>  
+            <param-value>/WEB-INF/classes/log4j.properties</param-value>  
+        </init-param>  
+        <load-on-startup>1</load-on-startup>  
+    </servlet>
+  
+   <servlet>
+	    <servlet-name>WorkitemCheckServlet</servlet-name>
+	    <servlet-class>com.gzb.service.WorkitemCheckServlet</servlet-class>
+	  	<load-on-startup>1</load-on-startup>
+   </servlet>
+  
+  <servlet>
+    <servlet-name>APIService</servlet-name>
+    <servlet-class>com.weixin.api.APIService</servlet-class>
+  </servlet>
+ 
+  <servlet>
+  
+    <servlet-name>SecurityServlet</servlet-name>
+    <servlet-class>com.weixin.test.SecurityServlet</servlet-class>
+    <load-on-startup>1</load-on-startup>
+  </servlet>
+ 
+  <servlet>
+    <servlet-name>SetIndustryServlet</servlet-name>
+    <servlet-class>com.weixin.mesModel.SetIndustryServlet</servlet-class>
+  </servlet>
+ 
+  <servlet>
+    <servlet-name>CommonServlet</servlet-name>
+    <servlet-class>com.weixin.mesModel.CommonServlet</servlet-class>
+  </servlet>
+
+ 
+<servlet>
+    <servlet-name>AuthImage</servlet-name>  
+    <servlet-class>com.gzb.AuthImage.AuthImage</servlet-class>  
+</servlet>
+  <servlet>
+    <description>关于金钱的控制器</description>
+    <servlet-name>MoneyControlerServlet</servlet-name>
+    <servlet-class>com.gzb.api.controler.MoneyControlerServlet</servlet-class>
+  </servlet>
+  
+
+<servlet-mapping>  
+    <servlet-name>AuthImage</servlet-name>  
+    <url-pattern>/authImage</url-pattern>  
+ </servlet-mapping>
+
+
+
+  <servlet-mapping>
+    <servlet-name>APIService</servlet-name>
+    <url-pattern>/APIInterface</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>SecurityServlet</servlet-name>
+    <url-pattern>/Security</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>SetIndustryServlet</servlet-name>
+    <url-pattern>/SetIndustryServlet</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>CommonServlet</servlet-name>
+    <url-pattern>/CommonServlet</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>MoneyControlerServlet</servlet-name>
+    <url-pattern>/servlet/MoneyControlerServlet</url-pattern>
+  </servlet-mapping>
+  
+  <welcome-file-list>
+    <welcome-file>index.jsp</welcome-file>
+  </welcome-file-list>
+</web-app>

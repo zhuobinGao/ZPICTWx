@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<sqlcontent>
+
+	<sql id="eir001" mes="Eir主单查询">
+		select e.eirmainid,decode(e.eirmaintype,'I','进口箱','O','出口箱','E','自由空箱','C','自由组合箱') ,e.bl,e.containerowner,to_char(e.createtime,'yyyy-mm-dd hh24:mi') createtime
+from er_eirmain e where 1=1 
+and exists (
+    select * from er_eir e1 where e1.eirmainid=e.eirmainid and e1.preeirstate not in ('C')
+)
+and e.bl=? and e.eirmaintype=? and e.containerowner=?
+	</sql>
+	
+	<sql id="eir002" mes="Eir明细查询">
+		with tmp as (
+  select e.*
+  from er_eir e 
+  where 1=1 
+  and e.eirmainid=?
+  and e.eirtype='S'
+)
+
+select teir.*,c.containerno,c.emptyfull,c.containersize||''''||c.containertype||''''||c.containerheight as sth,
+	    decode(taketype,'EF','提空返重', 'FE','提重返空','EE','提空返空', 'FF','提重返重', 'EN','提空不返','FN','提重不返','其他') taketypename
+ from (
+    select
+      e.eirtype,nvl(e.containerid,t.containerid) containerid,e.taketype,e.preeirstate,tt1.truckno,
+      t.eirtype seirtype,t.preeirstate spreeirstate,tt2.truckno truckno2,t.taketype tty,e.eirid eid,t.eirid tid
+    from er_eir e 
+    left join tmp t on t.eirid = e.refbackeirid 
+    left join er_trucktimes tt1 on tt1.trucktimesid=e.trucktimesid
+    left join er_trucktimes tt2 on tt2.trucktimesid=t.trucktimesid
+    where 1=1 
+    and e.eirmainid=?
+    and e.eirtype='T'
+    union 
+    select 
+      e.eirtype,nvl(e.containerid,t.containerid) containerid,e.taketype,e.preeirstate,tt1.truckno,
+      t.eirtype seirtype,t.preeirstate spreeirstate,tt2.truckno truckno,t.taketype tty,e.eirid eid,t.eirid tid
+    from tmp t
+    left join er_eir e on t.refbackeirid=e.eirid
+    left join er_trucktimes tt1 on tt1.trucktimesid=e.trucktimesid
+    left join er_trucktimes tt2 on tt2.trucktimesid=t.trucktimesid
+    where 1=1 
+    and t.eirmainid=?
+    and t.eirtype='S'
+) teir 
+left join cm_containers c on c.containerid=teir.containerid
+
+where 1=1
+and (
+     ( eid is null and tid is not null and spreeirstate!='C' )
+     or
+      ( tid is null and eid is not null and preeirstate!='C' )
+     or
+     ( tid is not null and eid is not null and preeirstate != 'C' and spreeirstate!= 'C' )
+)
+	</sql>
+	
+	
+	<sql id="con001">
+		select c.CONTAINERNO,c.PARTFLAG ,
+( select n.inaimname from cm_inaim n where n.inaim=c.INAIM) inaim,
+decode(c.INTYPE,'G',(select t.truckno from er_trucktimes t where t.trucktimesid=c.INTRUCKTIMESID) ,
+                'B',(select v.cvesselname||'/'||c.inboundvoy from vs_berthplan v where v.berthplanno=c.INBERTHPLANNO ),
+                'S',(select v.cvesselname||'/'||c.inboundvoy from vs_berthplan v where v.berthplanno=c.INBERTHPLANNO )           
+                ) intool,
+decode(c.outTYPE,'G',(select t.truckno from er_trucktimes t where t.trucktimesid=c.OUTTRUCKTIMESID) ,
+                'B',(select v.cvesselname||'/'||c.outboundvoy from vs_berthplan v where v.berthplanno=c.OUTBERTHPLANNO ),
+                'S',(select v.cvesselname||'/'||c.outboundvoy from vs_berthplan v where v.berthplanno=c.OUTBERTHPLANNO )           
+                ) outtool,
+to_char(c.INTIME,'yyyy-mm-dd hh24:mi') intime,to_char(c.OUTTIME,'yyyy-mm-dd hh24:mi') outtime,c.PARTFLAG,nvl(c.bl,'无') bl,nvl(c.do,'无') do,
+substr(c.yardcell,0,3)||substr(c.yardcell,5,4)||substr(c.yardcell,10,1) yardcell,c.containersize||''''||c.containertype||''''||c.containerheight as sth,
+c.EMPTYFULL,nvl(c.TERMINALLOCKLIST,'无') TERMINALLOCKLIST
+from v_cm_container_all c
+where 1=1
+and c.INTYPE in ('G','B','S') 
+and c.CONTAINERNO=?
+and rownum &lt; 4 
+order by c.INTIME desc
+--c.CONTAINERNO = ?
+	</sql>
+
+</sqlcontent>

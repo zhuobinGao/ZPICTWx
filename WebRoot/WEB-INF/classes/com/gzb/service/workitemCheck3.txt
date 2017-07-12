@@ -1,0 +1,24 @@
+ select distinct to_char(w.performtime,'yyyymmdd') 作业完成时间,w.liftdevice lift机械, g.us_name
+ from wi_workitems w
+ left join wi_workitems w3 on w3.workitemno=w.parentworkitem
+ left join cm_containers c on c.containerid=w.containerid
+ left join pl_user g on g.us_logid=w.putman
+ where 1=1
+ and w.queuetype='S'
+ and exists (
+    select 1 from wi_workitems w2
+    where 1=1 
+    and w2.queuetype='S'
+    and w.containerid=w2.containerid
+    and w.workitemno!=w2.workitemno
+    and w.putdevice=w2.putdevice
+    and w.workqueueno=w2.workqueueno
+    and w.sourcepos=w2.target
+    and w.target=w2.sourcepos
+    and w.putman=w2.putman
+ )
+ and w.performtime = to_date(?,'yyyymmdd')
+ and w.status='E'
+ and not exists (
+     select 1 from IT_CHECK_WORKITEM t where t.putdevice=w.putdevice and g.us_name=t.us_name and t.puttiem=to_char(w.performtime,'yyyymmdd')
+ )
